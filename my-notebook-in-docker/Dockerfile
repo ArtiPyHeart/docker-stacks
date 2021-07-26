@@ -13,8 +13,6 @@ ARG miniforge_version="${conda_version}-${miniforge_patch_number}"
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update --yes && \
-    apt-get upgrade --yes && \
-    apt-get dist-upgrade --yes && \
     apt-get install --yes --no-install-recommends \
     tini \
     vim \
@@ -23,13 +21,12 @@ RUN apt-get update --yes && \
     sudo \
     locales \
     fonts-liberation \
-    run-one && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    run-one \ 
+    locales && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen \
-    apt-get update --yes && \
-    apt-get upgrade --yes && \
-    apt-get dist-upgrade --yes
+    dpkg-reconfigure locales && \
+    locale-gen en_US.UTF-8
 
 ENV CONDA_DIR=/opt/conda \
     SHELL=/bin/bash \
@@ -71,8 +68,9 @@ RUN set -x && \
     rm -rf "/home/root/.cache/yarn"
 
 RUN conda install --quiet --yes \
-    'anaconda' 'tqdm' 'faker' 'arrow' 'vaex' 'swifter' 'py-xgboost' 'lightgbm' && \
-    pip install modin[all] && \
+    'jupyterlab' 'notebook' 'jupyterhub' 'ipython' \
+    'numpy' 'pandas' 'pyarrow' 'fastparquet' 'dask' 'modin' \
+    'tqdm' 'faker' 'arrow' 'vaex' 'swifter' 'black' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
