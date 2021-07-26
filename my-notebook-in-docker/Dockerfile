@@ -44,17 +44,14 @@ ENV PATH="${CONDA_DIR}/bin:${PATH}" \
 RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc && \
     echo 'eval "$(command conda shell.bash hook 2> /dev/null)"' >> /etc/skel/.bashrc
 
-ARG PYTHON_VERSION=default
+ARG PYTHON_VERSION="3.7"
 
 WORKDIR /tmp
 
 RUN set -x && \
     # Miniforge installer
-    miniforge_arch=$(uname -m) && \
+    miniforge_arch="x86_64" && \
     export miniforge_arch && \
-    if [ "$miniforge_arch" == "aarm64" ]; then \
-      miniforge_arch="arm64"; \
-    fi; \
     miniforge_installer="${miniforge_python}-${miniforge_version}-Linux-${miniforge_arch}.sh" && \
     export miniforge_installer && \
     wget --quiet "https://github.com/conda-forge/miniforge/releases/download/${miniforge_version}/${miniforge_installer}" && \
@@ -74,8 +71,8 @@ RUN set -x && \
     rm -rf "/home/root/.cache/yarn"
 
 RUN conda install --quiet --yes \
-    'anaconda' \
-    'python=3.7' && \
+    'anaconda' 'tqdm' 'faker' 'arrow' 'vaex' 'swifter' 'py-xgboost' 'lightgbm' && \
+    pip install modin[all] && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
