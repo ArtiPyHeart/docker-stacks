@@ -71,5 +71,31 @@ RUN set -x && \
     'pip' && \
     conda update --all --quiet --yes && \
     conda clean --all -f -y && \
-    rm -rf "/home/${NB_USER}/.cache/yarn"
+    rm -rf "/home/root/.cache/yarn"
+
+RUN conda install --quiet --yes \
+    'anaconda' \
+    'python=3.7' && \
+    conda clean --all -f -y && \
+    npm cache clean --force && \
+    jupyter notebook --generate-config && \
+    jupyter lab clean && \
+    rm -rf "/home/root/.cache/yarn"
+
+EXPOSE 8888
+
+# Configure container startup
+ENTRYPOINT ["tini", "-g", "--"]
+CMD ["start-notebook.sh"]
+# Copy local files as late as possible to avoid cache busting
+COPY start.sh start-notebook.sh start-singleuser.sh /usr/local/bin/
+# Currently need to have both jupyter_notebook_config and jupyter_server_config to support classic and lab
+COPY jupyter_notebook_config.py /etc/jupyter/
+
+# Prepare upgrade to JupyterLab V3.0 #1205
+RUN sed -re "s/c.NotebookApp/c.ServerApp/g" \
+    /etc/jupyter/jupyter_notebook_config.py > /etc/jupyter/jupyter_server_config.py
+
+WORKDIR "${HOME}"
+
 
