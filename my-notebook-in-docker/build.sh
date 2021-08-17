@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t yqy618/data_clean:0.1 .

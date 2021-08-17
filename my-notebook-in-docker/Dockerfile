@@ -69,8 +69,9 @@ RUN set -x && \
 
 RUN conda install --quiet --yes \
     'jupyterlab' 'notebook' 'jupyterhub' 'ipython' \
-    'numpy' 'pandas' 'pyarrow' 'fastparquet' 'dask' 'modin' 'modin-dask' 'modin-ray' \
+    'numpy' 'pandas' 'pyarrow' 'fastparquet' 'dask' \
     'tqdm' 'faker' 'arrow' 'vaex' 'swifter' 'black' && \
+    pip install modin[all] && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
